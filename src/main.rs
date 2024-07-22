@@ -347,7 +347,7 @@ fn extract_command(opts: &mut Opts, colored_output: bool) -> Result<Option<Comma
 fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
     #[allow(unused)]
     let gnu_ls = |command_name| {
-        let color_arg = if colored_output {
+        let _color_arg = if colored_output {
             "--color=always"
         } else {
             "--color=never"
@@ -359,7 +359,6 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
             "-l", // long listing format
             "-h", // human readable file sizes
             "-d", // list directories themselves, not their contents
-            color_arg,
         ]
     };
     let cmd: Vec<&str> = if cfg!(unix) {
@@ -371,13 +370,13 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
             target_os = "openbsd"
         )) {
             // Assume ls is GNU ls
-            gnu_ls("ls")
+            gnu_ls("eza")
         } else {
             // MacOS, DragonFlyBSD, FreeBSD
             use std::process::{Command, Stdio};
 
             // Use GNU ls, if available (support for --color=auto, better LS_COLORS support)
-            let gnu_ls_exists = Command::new("gls")
+            let gnu_ls_exists = Command::new("eza")
                 .arg("--version")
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
@@ -385,10 +384,10 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
                 .is_ok();
 
             if gnu_ls_exists {
-                gnu_ls("gls")
+                gnu_ls("eza")
             } else {
                 let mut cmd = vec![
-                    "ls", // BSD version of ls
+                    "eza", // BSD version of ls
                     "-l", // long listing format
                     "-h", // '--human-readable' is not available, '-h' is
                     "-d", // '--directory' is not available, but '-d' is
@@ -406,7 +405,7 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
         use std::process::{Command, Stdio};
 
         // Use GNU ls, if available
-        let gnu_ls_exists = Command::new("ls")
+        let gnu_ls_exists = Command::new("eza")
             .arg("--version")
             .stdout(Stdio::null())
             .stderr(Stdio::null())
@@ -414,10 +413,10 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
             .is_ok();
 
         if gnu_ls_exists {
-            gnu_ls("ls")
+            gnu_ls("eza")
         } else {
             return Err(anyhow!(
-                "'fd --list-details' is not supported on Windows unless GNU 'ls' is installed."
+                "'fd --list-details' is not supported on Windows unless eza is installed."
             ));
         }
     } else {
